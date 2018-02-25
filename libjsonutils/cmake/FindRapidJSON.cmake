@@ -33,13 +33,14 @@ find_package_handle_standard_args(RapidJSON
 )
 
 if(RapidJSON_FOUND)
-    set(RapidJSON_INCLUDE_DIRS ${RapidJSON_INCLUDE_DIR})
+    #Set include dirs to parent, to enable includes like #include <rapidjson/document.h>
+    get_filename_component(RapidJSON_INCLUDE_DIRS ${RapidJSON_INCLUDE_DIR} DIRECTORY)
 endif()
 
 if(RapidJSON_FOUND AND NOT TARGET RapidJSON::RapidJSON)
     add_library(RapidJSON::RapidJSON INTERFACE IMPORTED)
     set_target_properties(RapidJSON::RapidJSON PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${RapidJSON_INCLUDE_DIR}"
+        INTERFACE_INCLUDE_DIRECTORIES "${RapidJSON_INCLUDE_DIRS}"
     )
 endif()
 
