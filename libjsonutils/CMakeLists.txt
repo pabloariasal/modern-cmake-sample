@@ -21,7 +21,7 @@ add_library(JSONUtils::jsonutils ALIAS jsonutils)
 
 #Set target properties
 target_include_directories(jsonutils
-    PUBLIC 
+    PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE
@@ -29,13 +29,13 @@ target_include_directories(jsonutils
 )
 
 target_compile_features(jsonutils PRIVATE cxx_auto_type)
-target_compile_options(jsonutils PRIVATE -Wall)
+target_compile_options(jsonutils PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
 
 target_link_libraries(jsonutils
     PUBLIC
         Boost::boost RapidJSON::RapidJSON
     PRIVATE
-        Boost::regex 
+        Boost::regex
 )
 
 ##############################################
