@@ -21,5 +21,5 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
 
 # Now simply link against gtest or gtest_main as needed. Eg
 add_executable(json_utils_test src/main.cpp)
+target_compile_features(json_utils_test PRIVATE cxx_auto_type)
 target_link_libraries(json_utils_test gtest_main JSONUtils::jsonutils)
-#add_test(NAME example_test COMMAND example)
