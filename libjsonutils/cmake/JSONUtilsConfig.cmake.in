@@ -1,15 +1,12 @@
 get_filename_component(JSONUTILS_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-#
-# NOTE: We had to use find_package because find_dependency does not support
-# COMPONENTS or MODULE until 3.15.0? CK
-#
+include(CMakeFindDependencyMacro)
+
 list(APPEND CMAKE_MODULE_PATH ${JSONUTILS_CMAKE_DIR})
 # NOTE: to find FindRapidJSON.cmake
-find_package(RAPIDJSON @MIN_RAPIDJSON_VERSION@ REQUIRED MODULE)
+find_dependency(RapidJSON @MIN_RapidJSON_VERSION@)
 list(REMOVE_AT CMAKE_MODULE_PATH -1)
 
-include(CMakeFindDependencyMacro)
-find_dependency(boost_regex @MIN_BOOST_VERSION@ REQUIRED CONFIG)
+find_dependency(boost_regex @MIN_BOOST_VERSION@)
 
 if(NOT TARGET JSONUtils::JSONUtils)
     include("${JSONUTILS_CMAKE_DIR}/JSONUtilsTargets.cmake")

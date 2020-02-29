@@ -1,6 +1,7 @@
 # see /opt/local/share/cmake-3.16/Modules/FindGTest.cmake
-find_package(GTEST QUIET)
+find_package(GTest QUIET)
 
+# NOTE: the upper case GTEST! CK
 if(NOT GTEST_FOUND)
   # Download and unpack googletest at configure time
   # but only if needed! CK
@@ -27,7 +28,7 @@ if(NOT GTEST_FOUND)
     EXCLUDE_FROM_ALL)
 endif()
 
-# Now simply link against gtest or gtest_main as needed. Eg
+# Now simply link against GTest::Main as needed. Eg
 add_executable(json_utils_test src/main.cpp)
 target_compile_features(json_utils_test PRIVATE cxx_auto_type)
 target_link_libraries(json_utils_test GTest::Main JSONUtils::jsonutils)

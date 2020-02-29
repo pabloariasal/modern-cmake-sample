@@ -1,6 +1,5 @@
-#include <jsonutils/json_utils.h>
-
 #include <gtest/gtest.h>
+#include <jsonutils/json_utils.h>
 
 TEST(JsonUtilsTest, loadFromFile)
 {

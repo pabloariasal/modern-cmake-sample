@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13..3.16 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.13...3.16 FATAL_ERROR)
 project(libjsonutils VERSION 1.0.0 LANGUAGES CXX)
 
 #Make sure that custom modules like FindRapidJSON are found
@@ -10,8 +10,8 @@ set(MIN_BOOST_VERSION 1.71)
 find_package(boost_headers ${MIN_BOOST_VERSION} REQUIRED CONFIG)
 find_package(boost_regex ${MIN_BOOST_VERSION} REQUIRED CONFIG)
 
-set(MIN_RAPIDJSON_VERSION 1.1)
-find_package(RapidJSON ${MIN_RAPIDJSON_VERSION} REQUIRED MODULE)
+set(MIN_RapidJSON_VERSION 1.1)
+find_package(RapidJSON ${MIN_RapidJSON_VERSION} REQUIRED MODULE)
 
 ##############################################
 # Create target and set properties

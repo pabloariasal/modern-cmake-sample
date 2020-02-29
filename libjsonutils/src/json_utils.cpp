@@ -1,10 +1,9 @@
-#include "file_utils.h"
-
 #include "jsonutils/json_utils.h"
 
 #include <boost/regex.hpp>
 #include <iostream>
 
+#include "file_utils.h"
 
 namespace jsonutils
 {
@@ -18,6 +17,7 @@ namespace jsonutils
         rapidjson::Document doc;
         doc.Parse("{\"source\": \"url\"}");
 
+        // force-move into the optional, as some compilers don't do this automatically
         return std::move(doc);
     }
 
@@ -32,6 +32,7 @@ namespace jsonutils
         rapidjson::Document doc;
         doc.Parse("{\"source\": \"file\"}");
 
+        // force-move into the optional, as some compilers don't do this automatically
         return std::move(doc);
     }
 
