@@ -28,10 +28,10 @@ if(NOT GTEST_FOUND)
     EXCLUDE_FROM_ALL)
 endif()
 
-# Now simply link against GTest::Main as needed. Eg
+# Now simply link against gtest as needed. Eg
 add_executable(json_utils_test src/main.cpp)
 target_compile_features(json_utils_test PRIVATE cxx_auto_type)
-target_link_libraries(json_utils_test GTest::Main JSONUtils::jsonutils)
+target_link_libraries(json_utils_test gtest_main JSONUtils::jsonutils)
 
 add_test(NAME json_utils_test
     COMMAND json_utils_test)
