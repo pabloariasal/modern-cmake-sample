@@ -1,10 +1,13 @@
 #FindRapidJSON.cmake
-# 
+#
 # Finds the rapidjson library
+#
+# from http://rapidjson.org/
 #
 # This will define the following variables
 #
 #    RapidJSON_FOUND
+#    RapidJSON_VERSION
 #    RapidJSON_INCLUDE_DIRS
 #
 # and the following imported targets
@@ -12,6 +15,7 @@
 #     RapidJSON::RapidJSON
 #
 # Author: Pablo Arias - pabloariasal@gmail.com
+#
 
 find_package(PkgConfig)
 pkg_check_modules(PC_RapidJSON QUIET RapidJSON)
