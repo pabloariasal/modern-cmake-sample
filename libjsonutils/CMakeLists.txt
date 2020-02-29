@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.13..3.16 FATAL_ERROR)
 project(libjsonutils VERSION 1.0.0 LANGUAGES CXX)
 
 #Make sure that custom modules like FindRapidJSON are found
@@ -6,14 +6,19 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 
 ##############################################
 # Declare dependencies
-find_package(Boost 1.55 REQUIRED COMPONENTS regex)
-find_package(RapidJSON 1.0 REQUIRED MODULE)
+set(MIN_BOOST_VERSION 1.71)
+find_package(boost_headers ${MIN_BOOST_VERSION} REQUIRED CONFIG)
+find_package(boost_regex ${MIN_BOOST_VERSION} REQUIRED CONFIG)
+
+set(MIN_RAPIDJSON_VERSION 1.1)
+find_package(RapidJSON ${MIN_RAPIDJSON_VERSION} REQUIRED MODULE)
 
 ##############################################
 # Create target and set properties
 
 add_library(jsonutils
     src/json_utils.cpp
+    src/file_utils.h
 )
 
 #Add an alias so that library can be used inside the build tree, e.g. when testing
@@ -29,11 +34,13 @@ target_include_directories(jsonutils
 )
 
 target_compile_features(jsonutils PRIVATE cxx_auto_type)
-target_compile_options(jsonutils PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)
+target_compile_options(jsonutils PRIVATE
+    $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+    -Wall -Wextra -Wpedantic>)
 
 target_link_libraries(jsonutils
     PUBLIC
-        Boost::boost RapidJSON::RapidJSON
+        Boost::headers RapidJSON::RapidJSON
     PRIVATE
         Boost::regex
 )
@@ -57,12 +64,12 @@ install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 #Export the targets to a script
 install(EXPORT jsonutils-targets
-  FILE
-    JSONUtilsTargets.cmake
-  NAMESPACE
-    JSONUtils::
-  DESTINATION
-    ${INSTALL_CONFIGDIR}
+    FILE
+        JSONUtilsTargets.cmake
+    NAMESPACE
+        JSONUtils::
+    DESTINATION
+        ${INSTALL_CONFIGDIR}
 )
 
 #Create a ConfigVersion.cmake file
@@ -92,9 +99,14 @@ configure_file(${CMAKE_CURRENT_LIST_DIR}/cmake/FindRapidJSON.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/FindRapidJSON.cmake
     COPYONLY)
 
-export(EXPORT jsonutils-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/JSONUtilsTargets.cmake NAMESPACE JSONUtils::)
+export(EXPORT jsonutils-targets
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/JSONUtilsTargets.cmake
+    NAMESPACE JSONUtils::)
 
 #Register package in user's package registry
 export(PACKAGE JSONUtils)
 
+##############################################
+## Add test
+enable_testing()
 add_subdirectory(test)
