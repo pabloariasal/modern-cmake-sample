@@ -1,14 +1,19 @@
 cmake_minimum_required(VERSION 3.13...3.16 FATAL_ERROR)
 project(libjsonutils VERSION 1.0.0 LANGUAGES CXX)
 
-#Make sure that custom modules like FindRapidJSON are found
+#Make sure that custom modules like cmake/FindRapidJSON.cmake are found
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 
 ##############################################
 # Declare dependencies
 set(MIN_BOOST_VERSION 1.71)
-find_package(boost_headers ${MIN_BOOST_VERSION} REQUIRED CONFIG)
-find_package(boost_regex ${MIN_BOOST_VERSION} REQUIRED CONFIG)
+#XXX find_package(boost_headers ${MIN_BOOST_VERSION} REQUIRED CONFIG)
+#XXX find_package(boost_regex ${MIN_BOOST_VERSION} REQUIRED CONFIG)
+add_library(Boost::headers INTERFACE IMPORTED)
+    set_target_properties(Boost::headers PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "$ENV{HOME}/Workspace/cpp/boost_1_71_0"
+        INTERFACE_COMPILE_DEFINITIONS "BOOST_ALL_NO_LIB"
+)
 
 set(MIN_RapidJSON_VERSION 1.1)
 find_package(RapidJSON ${MIN_RapidJSON_VERSION} REQUIRED MODULE)
@@ -41,8 +46,7 @@ target_compile_options(jsonutils PRIVATE
 target_link_libraries(jsonutils
     PUBLIC
         Boost::headers RapidJSON::RapidJSON
-    PRIVATE
-        Boost::regex
+    #XXX PRIVATE Boost::regex
 )
 
 ##############################################
@@ -109,4 +113,51 @@ export(PACKAGE JSONUtils)
 ##############################################
 ## Add test
 enable_testing()
-add_subdirectory(test)
+#XXX add_subdirectory(test)
+
+add_test(
+  NAME use-target_configure
+  COMMAND ${CMAKE_COMMAND}
+    -H${CMAKE_CURRENT_LIST_DIR}/use-target
+    -B${CMAKE_CURRENT_BINARY_DIR}/build_use-target
+    -G${CMAKE_GENERATOR}
+    -DJSONUtils_DIR=${CMAKE_STAGING_PREFIX}/${INSTALL_CMAKEDIR}
+    -DCMAKE_BUILD_TYPE=$<CONFIGURATION>
+  )
+set_tests_properties(use-target_configure
+  PROPERTIES
+    FIXTURES_SETUP use-target
+  )
+
+add_test(
+  NAME use-target_build
+  COMMAND ${CMAKE_COMMAND}
+    --build ${CMAKE_CURRENT_BINARY_DIR}/build_use-target
+    --config $<CONFIGURATION>
+  )
+set_tests_properties(use-target_build
+  PROPERTIES
+    FIXTURES_REQUIRED use-target
+  )
+
+add_test(
+  NAME use-target_test
+  COMMAND ${CMAKE_COMMAND}
+    --build ${CMAKE_CURRENT_BINARY_DIR}/build_use-target
+    --target test
+    --config $<CONFIGURATION>
+  )
+set_tests_properties(use-target_test
+  PROPERTIES
+    FIXTURES_REQUIRED use-target
+  )
+
+add_test(
+  NAME use-target_cleanup
+  COMMAND ${CMAKE_COMMAND}
+    -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/build_use-target
+  )
+set_tests_properties(use-target_cleanup
+  PROPERTIES
+    FIXTURES_CLEANUP use-target
+  )
