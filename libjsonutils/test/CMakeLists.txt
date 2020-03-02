@@ -29,7 +29,7 @@ if(NOT TARGET GTest::Main)
     fetchcontent_declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG master ### ${GTEST_MIN_VERSION}
+        GIT_TAG master #OR ${GTEST_MIN_VERSION}
     )
     fetchcontent_makeavailable(googletest)
 

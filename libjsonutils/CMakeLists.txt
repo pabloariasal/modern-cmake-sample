@@ -43,12 +43,13 @@ target_include_directories(jsonutils
 target_compile_features(jsonutils PRIVATE cxx_auto_type)
 target_compile_options(jsonutils PRIVATE
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-    -Wall -Wextra -Wpedantic>)
+    -Wall -Wextra -Wpedantic>
+)
 
 target_link_libraries(jsonutils
     PUBLIC
         Boost::headers RapidJSON::RapidJSON
-    #XXX PRIVATE Boost::regex
+    PRIVATE Boost::regex
 )
 
 ##############################################
@@ -103,11 +104,13 @@ install(FILES
 ## Exporting from the build tree
 configure_file(${CMAKE_CURRENT_LIST_DIR}/cmake/FindRapidJSON.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/FindRapidJSON.cmake
-    COPYONLY)
+    COPYONLY
+)
 
 export(EXPORT jsonutils-targets
     FILE ${CMAKE_CURRENT_BINARY_DIR}/JSONUtilsTargets.cmake
-    NAMESPACE JSONUtils::)
+    NAMESPACE JSONUtils::
+)
 
 #Register package in user's package registry
 export(PACKAGE JSONUtils)
@@ -118,49 +121,60 @@ enable_testing()
 
 add_subdirectory(test)
 
+
+##############################################
+## test the installed target and expor config too
+#
+# NOTE: can be only successful after first installation to staging
+# directory! CK
+
 add_test(
-  NAME use-target_configure
-  COMMAND ${CMAKE_COMMAND}
-    -H${CMAKE_CURRENT_LIST_DIR}/use-target
-    -B${CMAKE_CURRENT_BINARY_DIR}/build_use-target
-    -G${CMAKE_GENERATOR}
-    -DJSONUtils_DIR=${CMAKE_STAGING_PREFIX}/${INSTALL_CMAKEDIR}
-    -DCMAKE_BUILD_TYPE=$<CONFIGURATION>
-  )
+    NAME use-target_configure
+    COMMAND ${CMAKE_COMMAND}
+      -H${CMAKE_CURRENT_LIST_DIR}/use-target
+      -B${CMAKE_CURRENT_BINARY_DIR}/build_use-target
+      -G${CMAKE_GENERATOR}
+      -DJSONUtils_DIR=${CMAKE_STAGING_PREFIX}/${INSTALL_CMAKEDIR}
+      -Dboost_regex_DIR=${boost_regex_DIR}
+#FIXME how to quote right? CK -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}"
+      -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+      -DCMAKE_BUILD_TYPE=$<CONFIGURATION>
+)
 set_tests_properties(use-target_configure
-  PROPERTIES
-    FIXTURES_SETUP use-target
-  )
+    PROPERTIES
+        FIXTURES_SETUP use-target
+)
 
 add_test(
-  NAME use-target_build
-  COMMAND ${CMAKE_COMMAND}
-    --build ${CMAKE_CURRENT_BINARY_DIR}/build_use-target
-    --config $<CONFIGURATION>
-  )
+    NAME use-target_build
+    COMMAND ${CMAKE_COMMAND}
+        --build ${CMAKE_CURRENT_BINARY_DIR}/build_use-target
+        --config $<CONFIGURATION>
+)
 set_tests_properties(use-target_build
-  PROPERTIES
-    FIXTURES_REQUIRED use-target
-  )
+    PROPERTIES
+        FIXTURES_REQUIRED use-target
+)
+
+# NOTE: not yet possible! CK
+# add_test(
+#   NAME use-target_test
+#   COMMAND ${CMAKE_COMMAND}
+#     --build ${CMAKE_CURRENT_BINARY_DIR}/build_use-target
+#     --target test
+#     --config $<CONFIGURATION>
+# )
+# set_tests_properties(use-target_test
+#   PROPERTIES
+#     FIXTURES_REQUIRED use-target
+# )
 
 add_test(
-  NAME use-target_test
-  COMMAND ${CMAKE_COMMAND}
-    --build ${CMAKE_CURRENT_BINARY_DIR}/build_use-target
-    --target test
-    --config $<CONFIGURATION>
-  )
-set_tests_properties(use-target_test
-  PROPERTIES
-    FIXTURES_REQUIRED use-target
-  )
-
-add_test(
-  NAME use-target_cleanup
-  COMMAND ${CMAKE_COMMAND}
-    -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/build_use-target
-  )
+    NAME use-target_cleanup
+    COMMAND ${CMAKE_COMMAND}
+        -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/build_use-target
+)
 set_tests_properties(use-target_cleanup
-  PROPERTIES
-    FIXTURES_CLEANUP use-target
-  )
+    PROPERTIES
+        FIXTURES_CLEANUP use-target
+)
