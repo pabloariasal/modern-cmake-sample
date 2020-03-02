@@ -7,13 +7,15 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 ##############################################
 # Declare dependencies
 set(MIN_BOOST_VERSION 1.71)
-#XXX find_package(boost_headers ${MIN_BOOST_VERSION} REQUIRED CONFIG)
-#XXX find_package(boost_regex ${MIN_BOOST_VERSION} REQUIRED CONFIG)
-add_library(Boost::headers INTERFACE IMPORTED)
-    set_target_properties(Boost::headers PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "$ENV{HOME}/Workspace/cpp/boost_1_71_0"
-        INTERFACE_COMPILE_DEFINITIONS "BOOST_ALL_NO_LIB"
-)
+find_package(boost_headers ${MIN_BOOST_VERSION} REQUIRED CONFIG)
+find_package(boost_regex ${MIN_BOOST_VERSION} REQUIRED CONFIG)
+
+# NOTE: on debian stable only boost v1.67 available yet! CK
+# add_library(Boost::headers INTERFACE IMPORTED)
+#     set_target_properties(Boost::headers PROPERTIES
+#         INTERFACE_INCLUDE_DIRECTORIES "$ENV{HOME}/Workspace/cpp/boost_1_71_0"
+#         INTERFACE_COMPILE_DEFINITIONS "BOOST_ALL_NO_LIB"
+# )
 
 set(MIN_RapidJSON_VERSION 1.1)
 find_package(RapidJSON ${MIN_RapidJSON_VERSION} REQUIRED MODULE)
@@ -111,9 +113,10 @@ export(EXPORT jsonutils-targets
 export(PACKAGE JSONUtils)
 
 ##############################################
-## Add test
+## Add tests
 enable_testing()
-#XXX add_subdirectory(test)
+
+add_subdirectory(test)
 
 add_test(
   NAME use-target_configure
