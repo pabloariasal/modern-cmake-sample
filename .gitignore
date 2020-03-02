@@ -1,1 +1,5 @@
 build/
+.build-*/
+.configure*
+lcov/
+compile_commands.json
