@@ -17,7 +17,7 @@ PROJECT_NAME:=cookbook
 # and https://github.com/llvm-mirror/clang-tools-extra/blob/master/clang-tidy/tool/run-clang-tidy.py
 #
 ### checkAllHeader:='include/spdlog/[acdlstv].*'
-checkAllHeader?='include/spdlog/[^f].*'
+## checkAllHeader?='include/spdlog/[^f].*'
 checkAllHeader?='$(CURDIR)/.*'
 
 # NOTE: there are many errors with boost::test, doctest, catch test framework! CK
@@ -29,29 +29,22 @@ CHECKS?='-*,misc-*,boost-*,cert-*,misc-unused-parameters'
 
 # prevent hard config of find_package(asio 1.14.1 CONFIG CMAKE_FIND_ROOT_PATH_BOTH)
 ifeq (NO${CROSS_COMPILE},NO)
-    # CC:=/opt/local/bin/clang
-    # CXX:=/opt/local/bin/clang++
-    CC:=/usr/bin/gcc
-    CXX:=/usr/bin/g++
-
-    # NOTE: Do not uses with DESTDIR! CMAKE_INSTALL_PREFIX?=/
-    # DESTDIR?=/tmp/staging/$(PROJECT_NAME)
-    # export DESTDIR
-    # CMAKE_STAGING_PREFIX?=/usr/local
-    # CMAKE_PREFIX_PATH?="${DESTDIR}${CMAKE_STAGING_PREFIX};/usr/local;/opt/local;/usr"
+    CC:=/opt/local/bin/clang
+    CXX:=/opt/local/bin/clang++
 
     CMAKE_INSTALL_PREFIX?=/usr/local
     export CMAKE_INSTALL_PREFIX
     CMAKE_STAGING_PREFIX?=/tmp/staging/$(PROJECT_NAME)$(CMAKE_INSTALL_PREFIX)
     CMAKE_PREFIX_PATH?="$(CMAKE_STAGING_PREFIX);$(CMAKE_INSTALL_PREFIX);/usr/local/opt/boost;/opt/local;/usr"
 else
-    CMAKE_STAGING_PREFIX?=/tmp/staging/$(CROSS_COMPILE})$(PROJECT_NAME)
+    CMAKE_STAGING_PREFIX?=/tmp/staging/$(CROSS_COMPILE)$(PROJECT_NAME)
     CMAKE_PREFIX_PATH?="$(CMAKE_STAGING_PREFIX)"
 endif
 
 
 #NO! BUILD_TYPE?=Coverage
 # NOTE: use on shell$> BUILD_TYPE=Coverage make lcov
+
 BUILD_TYPE?=Debug
 BUILD_TYPE?=Release
 # GENERATOR:=Xcode
@@ -62,10 +55,10 @@ VERBOSE?=-v
 ##################################################
 
 
-BUILD_DIR:=../.build-$(PROJECT_NAME)-${CROSS_COMPILE}$(BUILD_TYPE)
+BUILD_DIR:=../.build-$(PROJECT_NAME)-$(CROSS_COMPILE)$(BUILD_TYPE)
 ifeq ($(BUILD_TYPE),Coverage)
     USE_LOCV=ON
-    ifeq (NO${CROSS_COMPILE},NO)
+    ifeq (NO$(CROSS_COMPILE),NO)
         CC:=/usr/bin/gcc
         CXX:=/usr/bin/g++
     endif
@@ -97,7 +90,7 @@ setup: $(BUILD_DIR) .clang-tidy compile_commands.json
       -DCMAKE_PREFIX_PATH=$(CMAKE_PREFIX_PATH) \
       -DCMAKE_STAGING_PREFIX=$(CMAKE_STAGING_PREFIX) \
       -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} $(CURDIR)
+      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_COMPILER=$(CC) -DCMAKE_CXX_COMPILER=$(CXX) $(CURDIR)
 	touch $@
 
 compile_commands.json: .configure-$(BUILD_TYPE)

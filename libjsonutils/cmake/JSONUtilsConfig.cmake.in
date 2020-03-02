@@ -5,7 +5,9 @@ set(_ORIG_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
 list(APPEND CMAKE_MODULE_PATH ${JSONUTILS_CMAKE_DIR})
 # NOTE: to find FindRapidJSON.cmake
 find_dependency(RapidJSON @MIN_RapidJSON_VERSION@)
-list(REMOVE_AT CMAKE_MODULE_PATH -1)
+# restore original path
+set(CMAKE_MODULE_PATH ${_ORIG_CMAKE_MODULE_PATH})
+unset(_ORIG_CMAKE_MODULE_PATH)
 
 find_dependency(boost_regex @MIN_BOOST_VERSION@)
 
