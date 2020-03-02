@@ -1,17 +1,13 @@
 get_filename_component(JSONUTILS_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 include(CMakeFindDependencyMacro)
 
+set(_ORIG_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
 list(APPEND CMAKE_MODULE_PATH ${JSONUTILS_CMAKE_DIR})
 # NOTE: to find FindRapidJSON.cmake
 find_dependency(RapidJSON @MIN_RapidJSON_VERSION@)
 list(REMOVE_AT CMAKE_MODULE_PATH -1)
 
-#XXX find_dependency(boost_regex @MIN_BOOST_VERSION@)
-add_library(Boost::headers INTERFACE IMPORTED)
-    set_target_properties(Boost::headers PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "$ENV{HOME}/Workspace/cpp/boost_1_71_0"
-        INTERFACE_COMPILE_DEFINITIONS "BOOST_ALL_NO_LIB"
-)
+find_dependency(boost_regex @MIN_BOOST_VERSION@)
 
 if(NOT TARGET JSONUtils::JSONUtils)
     include("${JSONUTILS_CMAKE_DIR}/JSONUtilsTargets.cmake")
