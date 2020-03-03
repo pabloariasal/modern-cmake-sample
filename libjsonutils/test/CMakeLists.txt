@@ -40,5 +40,4 @@ else()
     target_link_libraries(json_utils_test GTest::Main JSONUtils::jsonutils)
 endif()
 
-add_test(NAME json_utils_test
-    COMMAND json_utils_test)
+add_test(NAME json_utils_test COMMAND json_utils_test)
