@@ -16,6 +16,9 @@
 #
 # Author: Pablo Arias - pabloariasal@gmail.com
 #
+if(TARGET RapidJSON::RapidJSON)
+    return()
+endif()
 
 find_package(PkgConfig)
 pkg_check_modules(PC_RapidJSON QUIET RapidJSON)
@@ -41,7 +44,7 @@ if(RapidJSON_FOUND)
     get_filename_component(RapidJSON_INCLUDE_DIRS ${RapidJSON_INCLUDE_DIR} DIRECTORY)
 endif()
 
-if(RapidJSON_FOUND AND NOT TARGET RapidJSON::RapidJSON)
+if(RapidJSON_FOUND)
     add_library(RapidJSON::RapidJSON INTERFACE IMPORTED)
     set_target_properties(RapidJSON::RapidJSON PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${RapidJSON_INCLUDE_DIRS}"

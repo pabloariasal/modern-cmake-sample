@@ -2,14 +2,18 @@ get_filename_component(JSONUTILS_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 include(CMakeFindDependencyMacro)
 
 set(_ORIG_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
+# NOTE: to find FindRapidJSON.cmake and Findboost_regex.cmake wrapper
 list(APPEND CMAKE_MODULE_PATH ${JSONUTILS_CMAKE_DIR})
-# NOTE: to find FindRapidJSON.cmake
+message(STATUS "CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
+
 find_dependency(RapidJSON @MIN_RapidJSON_VERSION@)
+#TODO find_dependency(boost_regex @MIN_BOOST_VERSION@)
+# NOTE: workaround for debian stable with boost v1.67
+find_package(boost_regex @MIN_BOOST_VERSION@ MODULE)
+
 # restore original path
 set(CMAKE_MODULE_PATH ${_ORIG_CMAKE_MODULE_PATH})
 unset(_ORIG_CMAKE_MODULE_PATH)
-
-find_dependency(boost_regex @MIN_BOOST_VERSION@)
 
 if(NOT TARGET JSONUtils::JSONUtils)
     include("${JSONUTILS_CMAKE_DIR}/JSONUtilsTargets.cmake")
