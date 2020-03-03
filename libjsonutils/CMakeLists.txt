@@ -119,7 +119,7 @@ enable_testing()
 add_subdirectory(test)
 
 ##############################################
-## test the installed target and expor config too
+## test the installed target and export config too
 #
 # NOTE: can be only successful after first installation to staging
 # directory! CK
