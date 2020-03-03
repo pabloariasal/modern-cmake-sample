@@ -31,6 +31,8 @@ CHECKS?='-*,misc-*,boost-*,cert-*,-misc-unused-parameters'
 ifeq (NO${CROSS_COMPILE},NO)
     # CC:=/opt/local/bin/clang
     # CXX:=/opt/local/bin/clang++
+    CC:=/usr/bin/gcc
+    CXX:=/usr/bin/g++
 
     CMAKE_INSTALL_PREFIX?=/usr/local
     export CMAKE_INSTALL_PREFIX
@@ -85,7 +87,7 @@ run-clang-tidy: setup .configure-$(BUILD_TYPE) compile_commands.json
 	egrep '\b(warning|error):' run-clang-tidy.log | perl -pe 's/(^.*) (warning|error):/\2/' | sort -u
 
 setup: $(BUILD_DIR) .clang-tidy compile_commands.json
-	find . \( -type d -name '.build*' -prune \) -o -type f \( -name CMakeLists.txt -o -name '*.cmake' -o -name '*.cmake.in' -o -name '*meson*' \) -print > .buildfiles.lst
+	find -L . \( -type d -name '.build*' -prune \) -o -type f \( -name CMakeLists.txt -o -name '*.cmake' -o -name '*.cmake.in' -o -name '*meson*' \) -print > .buildfiles.lst
 
 .configure-$(BUILD_TYPE): CMakeLists.txt
 	cd $(BUILD_DIR) && cmake -G $(GENERATOR) -Wdeprecated -Wdev \

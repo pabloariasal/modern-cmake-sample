@@ -7,9 +7,10 @@ message(STATUS "CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
 
 ##############################################
 # Declare dependencies
-set(MIN_BOOST_VERSION 1.67)
-# find_package(boost_headers ${MIN_BOOST_VERSION} REQUIRED CONFIG)
+# workaround use boost v1.67
+set(MIN_BOOST_VERSION 1.67) # TODO should be 1.71
 find_package(boost_regex ${MIN_BOOST_VERSION} REQUIRED MODULE)
+#TODO find_package(boost_headers ${MIN_BOOST_VERSION} REQUIRED CONFIG)
 
 set(MIN_RapidJSON_VERSION 1.1)
 find_package(RapidJSON ${MIN_RapidJSON_VERSION} REQUIRED MODULE)
@@ -165,18 +166,17 @@ set_tests_properties(use-target_build
         FIXTURES_REQUIRED use-target
 )
 
-# NOTE: not yet possible! CK
-# add_test(
-#   NAME use-target_test
-#   COMMAND ${CMAKE_COMMAND}
-#     --build ${CMAKE_CURRENT_BINARY_DIR}/build_use-target
-#     --target test
-#     --config $<CONFIGURATION>
-# )
-# set_tests_properties(use-target_test
-#   PROPERTIES
-#     FIXTURES_REQUIRED use-target
-# )
+add_test(
+    NAME use-target_test
+    COMMAND ${CMAKE_COMMAND}
+        --build ${CMAKE_CURRENT_BINARY_DIR}/build_use-target
+        --target test
+        --config $<CONFIGURATION>
+)
+set_tests_properties(use-target_test
+    PROPERTIES
+        FIXTURES_REQUIRED use-target
+)
 
 add_test(
     NAME use-target_cleanup
