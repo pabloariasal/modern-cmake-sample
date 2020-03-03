@@ -6,10 +6,9 @@
 # Disable the built-in implicit rules.
 MAKEFLAGS+= --no-builtin-rules
 
-.PHONY: setup show all test lcov install check format clean distclean
+.PHONY: setup showsetup all test install check format clean distclean lcov
 
-#XXX PROJECT_NAME:=$(shell basename $${PWD})
-PROJECT_NAME:=cookbook
+PROJECT_NAME:=$(shell basename $${PWD})
 
 ##################################################
 # begin of config part
@@ -22,15 +21,16 @@ checkAllHeader?='$(CURDIR)/.*'
 
 # NOTE: there are many errors with boost::test, doctest, catch test framework! CK
 # CHECKS?='-*non-private-member-*,-cppcoreguidelines-pro-bounds-*,-cppcoreguidelines-pro-type-vararg,-cppcoreguidelines-macro-usage,-cppcoreguidelines-avoid-*,-modernize-avoid-*,-readability-magic-numbers'
-# CHECKS?='-*,-cppcoreguidelines-*,cppcoreguidelines-pro-*'
+# CHECKS?='-*,modernize-*'
+# CHECKS?='-*,cppcoreguidelines-*,-cppcoreguidelines-pro-*'
 # CHECKS?='-*,portability-*,readability-*'
-CHECKS?='-*,misc-*,boost-*,cert-*,misc-unused-parameters'
+CHECKS?='-*,misc-*,boost-*,cert-*,-misc-unused-parameters'
 
 
 # prevent hard config of find_package(asio 1.14.1 CONFIG CMAKE_FIND_ROOT_PATH_BOTH)
 ifeq (NO${CROSS_COMPILE},NO)
-    CC:=/opt/local/bin/clang
-    CXX:=/opt/local/bin/clang++
+    # CC:=/opt/local/bin/clang
+    # CXX:=/opt/local/bin/clang++
 
     CMAKE_INSTALL_PREFIX?=/usr/local
     export CMAKE_INSTALL_PREFIX
@@ -45,10 +45,15 @@ endif
 #NO! BUILD_TYPE?=Coverage
 # NOTE: use on shell$> BUILD_TYPE=Coverage make lcov
 
+# BUILD_TYPE:=Release
 BUILD_TYPE?=Debug
-BUILD_TYPE?=Release
+
+#some cmake generator options
 # GENERATOR:=Xcode
+# GENERATOR:='CodeBlocks - Ninja'
+# GENERATOR:='Eclipse CDT4 - Ninja'
 GENERATOR?=Ninja
+
 VERBOSE?=-v
 
 # end of config part
@@ -66,13 +71,13 @@ else
     USE_LOCV=OFF
 endif
 
+# default target
 all: setup .configure-$(BUILD_TYPE)
 	cmake --build $(BUILD_DIR) -- $(VERBOSE)
 
 test: all
 	cd $(BUILD_DIR) && ctest -C $(BUILD_TYPE) --rerun-failed --output-on-failure .
 	cd $(BUILD_DIR) && ctest -C $(BUILD_TYPE) .
-
 
 # NOTE: we do only check the new cpp file! CK
 run-clang-tidy: setup .configure-$(BUILD_TYPE) compile_commands.json
@@ -82,8 +87,6 @@ run-clang-tidy: setup .configure-$(BUILD_TYPE) compile_commands.json
 setup: $(BUILD_DIR) .clang-tidy compile_commands.json
 	find . \( -type d -name '.build*' -prune \) -o -type f \( -name CMakeLists.txt -o -name '*.cmake' -o -name '*.cmake.in' -o -name '*meson*' \) -print > .buildfiles.lst
 
-#     -DINSTALL_CMAKEDIR=lib/cmake/$(PROJECT_NAME) \
-#
 .configure-$(BUILD_TYPE): CMakeLists.txt
 	cd $(BUILD_DIR) && cmake -G $(GENERATOR) -Wdeprecated -Wdev \
       -DUSE_LCOV=$(USE_LOCV) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) \
@@ -99,12 +102,11 @@ compile_commands.json: .configure-$(BUILD_TYPE)
 $(BUILD_DIR): GNUmakefile
 	mkdir -p $@
 
-
 format: .clang-format
 	find . -type f \( -name '*.hxx' -o -name '*.hpp' -o -name '*.cxx' -o -name '*.cpp' \) -print0 | xargs -0 clang-format -style=file -i
 
-show: setup
-	cmake -S $(CURDIR) -B $(BUILD_DIR) -L --trace
+showsetup: setup
+	cmake -S $(CURDIR) -B $(BUILD_DIR) -LA --trace
 
 check: $(BUILD_DIR)
 	cmake --build $(BUILD_DIR) --target $@ | tee run-clang-tidy.log 2>&1
