@@ -121,8 +121,18 @@ add_subdirectory(test)
 ##############################################
 ## test the installed target and export config too
 #
-# NOTE: can be only successful after first installation to staging
-# directory! CK
+# NOTE: we have first to install into the staging directory! CK
+add_test(
+  NAME use-target_install
+  COMMAND ${CMAKE_COMMAND}
+    --build ${CMAKE_CURRENT_BINARY_DIR}
+    --target install
+    --config $<CONFIGURATION>
+)
+set_tests_properties(use-target_install
+  PROPERTIES
+    FIXTURES_SETUP use-install
+)
 
 add_test(
     NAME use-target_configure
@@ -140,6 +150,7 @@ add_test(
 )
 set_tests_properties(use-target_configure
     PROPERTIES
+        FIXTURES_REQUIRED use-install
         FIXTURES_SETUP use-target
 )
 
