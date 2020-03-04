@@ -12,4 +12,4 @@ if(NOT TARGET JSONUtils::JSONUtils)
     include("${JSONUTILS_CMAKE_DIR}/JSONUtilsTargets.cmake")
 endif()
 
-set(JSONUTILS_lIBRARIES JSONUtils::JSONUtils)
+set(JSONUTILS_LIBRARIES JSONUtils::JSONUtils)
