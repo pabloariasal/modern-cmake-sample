@@ -1,37 +1,43 @@
-# see /opt/local/share/cmake-3.16/Modules/FindGTest.cmake
-find_package(GTest QUIET)
-
-# NOTE: the upper case GTEST! CK
-if(NOT GTEST_FOUND)
-  # Download and unpack googletest at configure time
-  # but only if needed! CK
-  configure_file(${CMAKE_SOURCE_DIR}/cmake/GoogleTest-CMakeLists.txt.in
-    ${CMAKE_BINARY_DIR}/googletest-download/CMakeLists.txt)
-  execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-    RESULT_VARIABLE result
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download)
-  if(result)
-    message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-  endif()
-
-  execute_process(COMMAND ${CMAKE_COMMAND} --build .
-    RESULT_VARIABLE result
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download)
-  if(result)
-    message(FATAL_ERROR "Build step for googletest failed: ${result}")
-  endif()
-
-  # Add googletest directly to our build. This defines
-  # the gtest and gtest_main targets.
-  add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
-    ${CMAKE_BINARY_DIR}/googletest-build
-    EXCLUDE_FROM_ALL)
+option(INSTALL_GTEST "Enable installation of googletest" ON)
+set(GTEST_MIN_VERSION 1.10.0)
+if(NOT INSTALL_GTEST)
+    # see /opt/local/share/cmake-3.16/Modules/FindGTest.cmake
+    find_package(GTest ${GTEST_MIN_VERSION} QUIET)
 endif()
 
-# Now simply link against gtest as needed. Eg
 add_executable(json_utils_test src/main.cpp)
 target_compile_features(json_utils_test PRIVATE cxx_auto_type)
-target_link_libraries(json_utils_test gtest_main JSONUtils::jsonutils)
 
-add_test(NAME json_utils_test
-    COMMAND json_utils_test)
+if(NOT TARGET GTest::Main)
+    include(FetchContent)
+    if(CMAKE_VERSION VERSION_LESS "3.14")
+        function(fetchcontent_makeavailable name)
+            fetchcontent_getproperties(${name})
+            if(NOT ${name}_POPULATED)
+                fetchcontent_populate(${name})
+                add_subdirectory(${${name}_SOURCE_DIR} ${${name}_BINARY_DIR})
+                include_directories(${${name}_SOURCE_DIR}/include)
+            endif()
+        endfunction()
+    endif()
+
+    # --------------------------------------------------------------------
+    # Download and unpack googletest at configure time
+    # but only if needed or requested! CK
+    option(BUILD_GMOCK "Builds the googlemock subproject" OFF)
+    message(WARNING "Try to get googlemock with FetchContent ...")
+    fetchcontent_declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG master #OR ${GTEST_MIN_VERSION}
+    )
+    fetchcontent_makeavailable(googletest)
+
+    # Now simply link against gtest or gtest_main as needed. i.e.:
+    target_link_libraries(json_utils_test gtest_main JSONUtils::jsonutils)
+    # --------------------------------------------------------------------
+else()
+    target_link_libraries(json_utils_test GTest::Main JSONUtils::jsonutils)
+endif()
+
+add_test(NAME json_utils_test COMMAND json_utils_test)
