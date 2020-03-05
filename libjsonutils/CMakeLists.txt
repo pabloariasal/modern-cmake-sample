@@ -135,19 +135,22 @@ set_tests_properties(use-target_install
     FIXTURES_SETUP use-install
 )
 
+# Quote all the semicolons in cmake list variable
+string(REPLACE ";" "\\;" QUOTED_CMAKE_PREFIX_PATH
+       "${CMAKE_PREFIX_PATH}"
+)
+
 add_test(
     NAME use-target_configure
     COMMAND ${CMAKE_COMMAND}
         -H${CMAKE_CURRENT_LIST_DIR}/use-target
         -B${CMAKE_CURRENT_BINARY_DIR}/build_use-target
         -G${CMAKE_GENERATOR}
-#XXX    -DCMAKE_MODULE_PATH=${CMAKE_STAGING_PREFIX}/${INSTALL_CONFIGDIR}
         -DJSONUtils_DIR=${CMAKE_STAGING_PREFIX}/${INSTALL_CONFIGDIR}
         -Dboost_regex_DIR=${boost_regex_DIR}
-#FIXME how to quote right? CK -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}"
+        -DCMAKE_PREFIX_PATH=${QUOTED_CMAKE_PREFIX_PATH}
         -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
         -DCMAKE_BUILD_TYPE=$<CONFIGURATION>
-#TODO: TBD WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/build_use-target
 )
 set_tests_properties(use-target_configure
     PROPERTIES
