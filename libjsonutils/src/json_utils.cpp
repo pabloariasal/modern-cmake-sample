@@ -18,7 +18,7 @@ namespace jsonutils
         doc.Parse("{\"source\": \"url\"}");
 
         // force-move into the optional, as some compilers don't do this automatically
-        return std::move(doc);
+        return doc;
     }
 
     boost::optional<rapidjson::Document> loadFromFile(const std::string& file)
@@ -33,7 +33,7 @@ namespace jsonutils
         doc.Parse("{\"source\": \"file\"}");
 
         // force-move into the optional, as some compilers don't do this automatically
-        return std::move(doc);
+        return doc;
     }
 
     boost::optional<rapidjson::Document> loadJson(const std::string& location)
