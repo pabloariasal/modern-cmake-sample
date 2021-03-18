@@ -1,17 +1,16 @@
-cmake_minimum_required(VERSION 3.13...3.16 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.13...3.19 FATAL_ERROR)
 project(libjsonutils VERSION 1.0.0 LANGUAGES CXX)
 
 #Make sure that custom modules like FindRapidJSON are found
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 
 ##############################################
-# Declare dependencies
-set(MIN_BOOST_VERSION 1.71)
-find_package(boost_headers ${MIN_BOOST_VERSION} REQUIRED CONFIG)
-find_package(boost_regex ${MIN_BOOST_VERSION} REQUIRED CONFIG)
+# Find system dependencies
+set(MIN_BOOST_VERSION 1.65)
+find_package(Boost ${MIN_BOOST_VERSION} REQUIRED COMPONENTS regex)
 
 set(MIN_RapidJSON_VERSION 1.1)
-find_package(RapidJSON ${MIN_RapidJSON_VERSION} REQUIRED MODULE)
+find_package(RapidJSON ${MIN_RapidJSON_VERSION} REQUIRED)
 
 ##############################################
 # Create target and set properties
@@ -103,7 +102,7 @@ export(EXPORT jsonutils-targets
     FILE ${CMAKE_CURRENT_BINARY_DIR}/JSONUtilsTargets.cmake
     NAMESPACE JSONUtils::)
 
-#Register package in user's package registry
+#Register package in the User Package Registry
 export(PACKAGE JSONUtils)
 
 ##############################################
